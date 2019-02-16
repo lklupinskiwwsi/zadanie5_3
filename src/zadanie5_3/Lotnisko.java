@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package zadanie4;
+package zadanie5_3;
 
 import java.awt.geom.Point2D;
 import static java.lang.Thread.sleep;

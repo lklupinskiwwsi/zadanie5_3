@@ -3,11 +3,18 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package zadanie4;
+package zadanie5_3;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.Point2D;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.Timer;
 
 import javax.swing.table.DefaultTableModel;
@@ -16,7 +23,7 @@ import javax.swing.table.DefaultTableModel;
  *
  * @author lesze
  */
-public class Zadanie4 extends javax.swing.JFrame {
+public class Zadanie5_3 extends javax.swing.JFrame {
     
     Lotnisko l1, l2, l3;
     Samolot[] s = new Samolot[6];
@@ -26,7 +33,7 @@ public class Zadanie4 extends javax.swing.JFrame {
     /**
      * Creates new form Zadanie4
      */
-    public Zadanie4() {
+    public Zadanie5_3() throws SQLException, ClassNotFoundException {
         initComponents();
 
         //lotniska
@@ -48,31 +55,59 @@ public class Zadanie4 extends javax.swing.JFrame {
         
         String[] kolumny = {"Kod lotu",
                             "Status lotu"};
-        Object[][] dane = {
-            { s[0].getKod(), s[0].getStatus() },
-            { s[1].getKod(), s[1].getStatus() },
-            { s[2].getKod(), s[2].getStatus() },
-            { s[3].getKod(), s[3].getStatus() },
-            { s[4].getKod(), s[4].getStatus() },
-            { s[5].getKod(), s[5].getStatus() },
-        };        
+        Object[][] dane = new Object[6][2];
+        
+        Class.forName("com.mysql.jdbc.Driver"); 
+        Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/samolotyilotniska?zeroDateTimeBehavior=convertToNull", "root", "test123!");
+        
+        Statement stmt = conn.createStatement();
+        stmt.executeUpdate("INSERT INTO statuslotu (idstatuslotu, kod, status) VALUES" + 
+        "(1, " + s[0].getKod() + ", \"" + s[0].getStatus() + "\"), " + 
+        "(2, " + s[1].getKod() + ", \"" + s[1].getStatus() + "\"), " +
+        "(3, " + s[2].getKod() + ", \"" + s[2].getStatus() + "\"), " + 
+        "(4, " + s[3].getKod() + ", \"" + s[3].getStatus() + "\"), " + 
+        "(5, " + s[4].getKod() + ", \"" + s[4].getStatus() + "\"), " +
+        "(6, " + s[5].getKod() + ", \"" + s[5].getStatus() + "\") " + 
+        "ON DUPLICATE KEY UPDATE kod=VALUES(kod), status=VALUES(status)");
+        
+        ResultSet rs = stmt.executeQuery("SELECT kod, status FROM statuslotu");
+        int i = 0;
+        while (rs.next()) {
+            dane[i][0] = rs.getInt("kod");
+            dane[i][1] = rs.getString("status");
+            i++;
+        }
+        
         model = new DefaultTableModel(dane, kolumny);
         jTable1.setModel(model);
-        
         
         Timer timer = new Timer(1000, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                                Object[][] dane = {
-                    { s[0].getKod(), s[0].getStatus() },
-                    { s[1].getKod(), s[1].getStatus() },
-                    { s[2].getKod(), s[2].getStatus() },
-                    { s[3].getKod(), s[3].getStatus() },
-                    { s[4].getKod(), s[4].getStatus() },
-                    { s[5].getKod(), s[5].getStatus() },
-                };
-                model.setDataVector(dane, kolumny);
-                jTable1.repaint();
+                try {
+                    stmt.executeUpdate("INSERT INTO statuslotu (idstatuslotu, kod, status) VALUES" + 
+                    "(1, " + s[0].getKod() + ", \"" + s[0].getStatus() + "\"), " + 
+                    "(2, " + s[1].getKod() + ", \"" + s[1].getStatus() + "\"), " +
+                    "(3, " + s[2].getKod() + ", \"" + s[2].getStatus() + "\"), " + 
+                    "(4, " + s[3].getKod() + ", \"" + s[3].getStatus() + "\"), " + 
+                    "(5, " + s[4].getKod() + ", \"" + s[4].getStatus() + "\"), " +
+                    "(6, " + s[5].getKod() + ", \"" + s[5].getStatus() + "\") " + 
+                    "ON DUPLICATE KEY UPDATE kod=VALUES(kod), status=VALUES(status)");
+                    
+                    ResultSet rs = stmt.executeQuery("SELECT kod, status FROM statuslotu");
+                    int i = 0;
+                    while (rs.next()) {
+
+                        dane[i][0] = rs.getInt("kod");
+                        dane[i][1] = rs.getString("status");
+                        i++;
+                    }
+
+                    model.setDataVector(dane, kolumny);
+                    jTable1.repaint();
+                } catch (SQLException ex) {
+                    Logger.getLogger(Zadanie5_3.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         });
         timer.start();
@@ -179,20 +214,29 @@ public class Zadanie4 extends javax.swing.JFrame {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(Zadanie4.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Zadanie5_3.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(Zadanie4.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Zadanie5_3.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(Zadanie4.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Zadanie5_3.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(Zadanie4.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Zadanie5_3.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
         //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new Zadanie4().setVisible(true);
+                try {
+                    try {
+                        new Zadanie5_3().setVisible(true);
+                    } catch (ClassNotFoundException ex) {
+                        Logger.getLogger(Zadanie5_3.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                } catch (SQLException ex) {
+                    Logger.getLogger(Zadanie5_3.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         });
         
